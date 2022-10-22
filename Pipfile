@@ -13,6 +13,7 @@ flask-cors = "*"
 werkzeug = "*"
 marshmallow-sqlalchemy = "*"
 flask-migrate = "*"
+pymysql = "*"
 
 [dev-packages]
 

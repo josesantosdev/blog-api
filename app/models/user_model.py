@@ -1,8 +1,12 @@
-from . import db, ma
+
+from app import db, ma
 from sqlalchemy import true, BigInteger, String, DateTime
 from marshmallow import fields
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
+
+
+
 #SQLAlchemy Model
 class User(db.Model):
         __tablename__ = 'Users'
@@ -70,14 +74,14 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         username = fields.Str(required=True)
         email = fields.Str(required=True)
         password = fields.Str(required=True)
-
+'''
     #HATEOS
     _links = ma.Hyperlinks({
-        "self": ma.URLFor("") #add controller route and method
+        "self": ma.URLFor(""), #add controller route and method
         "colletion": ma.URLFor("") #add controller route and method
     })
 
-
+'''
         
 
     
