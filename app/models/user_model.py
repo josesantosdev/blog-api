@@ -11,7 +11,7 @@ class User(db.Model):
         email = db.Column(db.String(255), nullable=False, unique=True)
         password = db.Column(db.String(255))
 
-#Marshmallow Serialize
+#Marshmallow Serealize
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
