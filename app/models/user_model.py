@@ -56,7 +56,8 @@ class User(db.Model):
         def verify_password(self, data):
             return check_password_hash(self.password, data.get('password'))
 
-
+        def __repr__(self) -> str:
+            return f'<id {self.id}>'
         
 #Marshmallow Serealize
 class UserSchema(ma.SQLAlchemyAutoSchema):
