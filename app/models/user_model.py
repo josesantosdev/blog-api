@@ -1,18 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
+from . import db, ma
 from sqlalchemy import true
 from marshmallow import fields
 
-
-db = SQLAlchemy
-ma = Marshmallow
-
-def condigure(app):
-    db.init_app(app)
-    ma.init_app(app)
-    app.db = db
-    
-
+#SQLAlchemy Model
 class User(db.Model):
         __tablename__ = 'Users'
         id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +11,7 @@ class User(db.Model):
         email = db.Column(db.String(255), nullable=False, unique=True)
         password = db.Column(db.String(255))
 
+#Marshmallow Serialize
 class UserSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = User
@@ -32,7 +23,13 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         email = fields.Str(required=True)
         password = fields.Str(required=True)
 
-        
+    #HATEOS
+    _links = ma.Hyperlinks({
+        "self": ma.URLFor("") #add controller route and method
+        "colletion": ma.URLFor("") #add controller route and method
+    })
+
+
         
 
     
