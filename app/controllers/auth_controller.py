@@ -3,6 +3,7 @@ from flask import Blueprint, request, Response, json
 from app import db, jwt
 from app.models.user_model import User, UserSchema
 from app.models.revoked_token_model import RevokedToken
+from flask_jwt_extended import create_access_token, create_refresh_token
 
 
 
@@ -26,12 +27,12 @@ class AuthController:
     @auth_controller.route('/register', methods=['POST'])
     def register():
         
-        user_schema = UserSchema()
-        req_data = request.get_json()
+        
+        request_data = request.get_json()
         try:
-            data = user_schema.load(req_data)
+            data = user_schema.load(request_data)
         except Exception:
-            message = {'error': 'Missing data for required field.'}
+            message = {'error': 'Missing data for required fields (name, email, password).'}
             return custom_response(message, 401)
        
         #checking if user already exust in db
@@ -42,13 +43,42 @@ class AuthController:
 
         user = User(data)
         user.save()
-        ser_data = user_schema.dump(user)
+        serealized_data = user_schema.dump(user)
         
-        return custom_response(ser_data, 201)
+        return custom_response(serealized_data, 201)
+
+    @auth_controller.route('/login', methods=['POST'])
+    def login():
+        request_data = request.get_json()
+        data = user_schema.load(request_data, partial=True)
+        user = User.get_user_by_email(data.get('email'))
+
+        if not data.get("email") or not data.get('password'):
+            return custom_response({'error': 'you need a email and passoword to sing in'},400)
+
+        if not user:
+            return custom_response({'error': 'invalid credentials'}, 400)
+        
+        if not user.verify_password(data.get('password')):
+            return custom_response({'error': 'invalid credentials'}, 400)
+
+        
+        serealize_data = user_schema.dump(user)
+
+
+        acess_token = create_access_token(serealize_data)
+        refresh_token = create_refresh_token(serealize_data)
+
+        message = {
+            "acess_token": acess_token,
+            "refresh_token": refresh_token
+        }
+        
+        return custom_response(message, 200)
 
 
 
-
+user_schema = UserSchema()
 
 def custom_response(res, status_code):
     return Response(

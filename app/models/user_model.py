@@ -57,8 +57,8 @@ class User(db.Model):
         def get_user_by_email(email):
             return User.query.filter_by(email=email).first()
 
-        def verify_password(self, data):
-            return check_password_hash(self.password, data.get("password"))
+        def verify_password(self, data_password):
+            return check_password_hash(self.password, data_password)
 
         def __repr__(self) -> str:
             return f'<id {self.id}>'
