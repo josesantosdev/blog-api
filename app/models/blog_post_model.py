@@ -1,6 +1,5 @@
 from app import db, ma
 from sqlalchemy import true, BigInteger, String, DateTime, Text, ForeignKey
-from sqlalchemy.orm import relationship
 from marshmallow import fields
 import datetime
 
@@ -14,7 +13,6 @@ class BlogPost(db.Model):
     owner_id = db.Column(BigInteger, ForeignKey('Users.id'), nullable=False)
     created_at = db.Column(DateTime)
     modified_at = db.Column(DateTime)
-    user = relationship('User')
 
     def __init__(self, data):
         self.title = data.get('title')
@@ -52,7 +50,6 @@ class BlogPostSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = BlogPost
         load_instance = true
-        include_relationships = True
         include_fk = True
 
         id = fields.Int(dump_only=True)

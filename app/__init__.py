@@ -21,6 +21,12 @@ def create_app():
     Migrate(app, app.db)
    
 
-    from .models import user_model, blog_post_model, revoked_token_model
+    from app.models.user_model import User
+    from app.models.blog_post_model import BlogPost
+    from app.models.revoked_token_model import RevokedToken
+
+    from app.controllers.auth_controller import AuthController
+
+    app.register_blueprint(AuthController.auth_controller, url_prefix='/api/v1')
 
     return app

@@ -1,8 +1,9 @@
 
-from app import db, ma
-from sqlalchemy import true, BigInteger, String, DateTime
-from marshmallow import fields
+from app import db
+from sqlalchemy import BigInteger, String, DateTime,true
+from marshmallow import fields, Schema
 from werkzeug.security import generate_password_hash, check_password_hash
+from .blog_post_model import BlogPostSchema
 import datetime
 
 
@@ -12,17 +13,16 @@ class User(db.Model):
         __tablename__ = 'Users'
         id = db.Column(BigInteger, primary_key=True)
         name = db.Column(String(255), nullable=False)
-        username = db.Column(String(255), nullable=False)
         email = db.Column(String(255), nullable=False, unique=True)
         password = db.Column(String(255))
         created_at = db.Column(DateTime)
         modifield_at = db.Column(DateTime)
+        blogposts = db.relationship('BlogPost', backref='Users', lazy=True)
 
-        def __init__(self, name, email, password, username) -> None:
-            self.name = name
-            self.email= email
-            self.password = generate_password_hash(password)
-            self.username = username
+        def __init__(self, data):
+            self.name = data.get("name")
+            self.email = data.get("email")
+            self.password = generate_password_hash(data.get("password"))
             self.created_at = datetime.datetime.utcnow()
             self.modified_at = datetime.datetime.utcnow()
 
@@ -32,8 +32,8 @@ class User(db.Model):
         
         def update(self, data):
             for key, item in data.items():
-                if key == 'password':
-                    self.password = generate_password_hash(data.get('password'))
+                if key == "password":
+                    self.password = generate_password_hash(data.get("password"))
                 
                 setattr(self, key, item)
             
@@ -55,25 +55,23 @@ class User(db.Model):
 
         @staticmethod
         def get_user_by_email(email):
-            return User.query.filter_by(email=email).firt()
+            return User.query.filter_by(email=email).first()
 
         def verify_password(self, data):
-            return check_password_hash(self.password, data.get('password'))
+            return check_password_hash(self.password, data.get("password"))
 
         def __repr__(self) -> str:
             return f'<id {self.id}>'
         
 #Marshmallow Serealize
-class UserSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = User
-        load_instance = true
-
-        id = fields.Integer()
-        name = fields.Str(required=True)
-        username = fields.Str(required=True)
-        email = fields.Str(required=True)
-        password = fields.Str(required=True)
+class UserSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    email = fields.Email(required=True)
+    password = fields.Str(required=True, load_only=True)
+    created_at = fields.DateTime(dump_only=True)
+    modified_at = fields.DateTime(dump_only=True)
+    blogposts = fields.Nested(BlogPostSchema, many=True)
 '''
     #HATEOS
     _links = ma.Hyperlinks({
