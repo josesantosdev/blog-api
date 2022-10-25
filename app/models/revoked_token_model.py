@@ -8,3 +8,8 @@ class RevokedToken(db.Model):
 
     id_token = db.Column(BigInteger, primary_key=True)
     jti = db.Column(String(100), nullable=False)
+
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()

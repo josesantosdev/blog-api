@@ -14,6 +14,8 @@ werkzeug = "*"
 marshmallow-sqlalchemy = "*"
 flask-migrate = "*"
 pymysql = "*"
+pytest-cov = "*"
+pytest = "*"
 
 [dev-packages]
 

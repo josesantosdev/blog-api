@@ -1,9 +1,9 @@
 from functools import partial
 from flask import Blueprint, request, Response, json, jsonify
-from app import db, jwt
+from app import jwt
 from app.models.user_model import User, UserSchema
 from app.models.revoked_token_model import RevokedToken
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_access_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_access_cookies, get_jwt
 
 
 
@@ -85,10 +85,28 @@ class AuthController:
         message = {
             "acess_token": access_token
         }
+
         set_access_cookies(jsonify(message), access_token)
 
         return custom_response(message, 200)
 
+    
+    @auth_controller.route('/logout', methods=['DELETE'])
+    @jwt_required()
+    def logout():
+        jti = get_jwt()['jti']
+        revoked_token = RevokedToken(jti=jti)
+        revoked_token.save()
+        return custom_response('Succesfully logged out', 200)
+    
+    #only accepts refresh
+    @auth_controller.route('/logout2', methods=['DELETE'])
+    @jwt_required(refresh=True)
+    def logout():
+        jti = get_jwt()['jti']
+        revoked_token = RevokedToken(jti=jti)
+        revoked_token.save()
+        return custom_response('Succesfully logged out', 200)
 
 user_schema = UserSchema()
 
