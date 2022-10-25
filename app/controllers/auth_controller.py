@@ -1,9 +1,9 @@
 from functools import partial
-from flask import Blueprint, request, Response, json
+from flask import Blueprint, request, Response, json, jsonify
 from app import db, jwt
 from app.models.user_model import User, UserSchema
 from app.models.revoked_token_model import RevokedToken
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_access_cookies
 
 
 
@@ -54,7 +54,7 @@ class AuthController:
         user = User.get_user_by_email(data.get('email'))
 
         if not data.get("email") or not data.get('password'):
-            return custom_response({'error': 'you need a email and passoword to sing in'},400)
+            return custom_response({'error': 'you need a email and passoword to sing in'}, 400)
 
         if not user:
             return custom_response({'error': 'invalid credentials'}, 400)
@@ -66,16 +66,28 @@ class AuthController:
         serealize_data = user_schema.dump(user)
 
 
-        acess_token = create_access_token(serealize_data)
+        access_token = create_access_token(serealize_data)
         refresh_token = create_refresh_token(serealize_data)
 
         message = {
-            "acess_token": acess_token,
+            "access_token": access_token,
             "refresh_token": refresh_token
         }
         
         return custom_response(message, 200)
 
+    @auth_controller.route('/refresh', methods=['POST'])
+    @jwt_required(refresh=True)
+    def refresh():
+        current_user = get_jwt_identity()
+        access_token = create_access_token(current_user)
+
+        message = {
+            "acess_token": access_token
+        }
+        set_access_cookies(jsonify(message), access_token)
+
+        return custom_response(message, 200)
 
 
 user_schema = UserSchema()
