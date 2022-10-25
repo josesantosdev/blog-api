@@ -28,9 +28,12 @@ class AuthController:
         
         user_schema = UserSchema()
         req_data = request.get_json()
-        data = user_schema.load(req_data)
-        
-        
+        try:
+            data = user_schema.load(req_data)
+        except Exception:
+            message = {'error': 'Missing data for required field.'}
+            return custom_response(message, 401)
+       
         #checking if user already exust in db
         user_in_db = User.get_user_by_email(data.get("email"))
         if user_in_db:
