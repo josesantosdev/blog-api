@@ -26,7 +26,9 @@ def create_app():
     from app.models.revoked_token_model import RevokedToken
 
     from app.controllers.auth_controller import AuthController
+    from app.controllers.user_controller import UserController
 
     app.register_blueprint(AuthController.auth_controller, url_prefix='/api/v1')
+    app.register_blueprint(UserController.user_controller, url_prefix='/api/v1')
 
     return app

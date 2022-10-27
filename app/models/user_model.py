@@ -1,6 +1,6 @@
 
-from app import db
-from sqlalchemy import BigInteger, String, DateTime,true
+from app import db, ma
+from sqlalchemy import BigInteger, String, DateTime
 from marshmallow import fields, Schema
 from werkzeug.security import generate_password_hash, check_password_hash
 from .blog_post_model import BlogPostSchema
@@ -10,14 +10,14 @@ import datetime
 
 #SQLAlchemy Model
 class User(db.Model):
-        __tablename__ = 'Users'
+        __tablename__ = 'users'
         id = db.Column(BigInteger, primary_key=True)
         name = db.Column(String(255), nullable=False)
         email = db.Column(String(255), nullable=False, unique=True)
         password = db.Column(String(255))
         created_at = db.Column(DateTime)
         modifield_at = db.Column(DateTime)
-        blogposts = db.relationship('BlogPost', backref='Users', lazy=True)
+        blogposts = db.relationship('BlogPost', backref='User', lazy=True)
 
         def __init__(self, data):
             self.name = data.get("name")
@@ -56,7 +56,10 @@ class User(db.Model):
         @staticmethod
         def get_user_by_email(email):
             return User.query.filter_by(email=email).first()
-
+        
+        def id_user(self):
+            return self.id
+    
         def verify_password(self, data_password):
             return check_password_hash(self.password, data_password)
 
@@ -72,14 +75,13 @@ class UserSchema(Schema):
     created_at = fields.DateTime(dump_only=True)
     modified_at = fields.DateTime(dump_only=True)
     blogposts = fields.Nested(BlogPostSchema, many=True)
-'''
+
     #HATEOS
     _links = ma.Hyperlinks({
-        "self": ma.URLFor(""), #add controller route and method
-        "colletion": ma.URLFor("") #add controller route and method
+        "self": ma.URLFor("user_controller.get_one_user", values=dict(id='<id>'))
     })
 
-'''
+
         
 
     
