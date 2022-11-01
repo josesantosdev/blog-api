@@ -1,0 +1,64 @@
+{
+    "openapi": "3.0.n",
+    "info": {
+        "title": "Blog Api",
+        "verison": "0.0.1"
+    },
+    "components": {
+        "schemas": {
+            "Users": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "jwt-access-token": {
+                "type": "object",
+                "properties": {
+                    "access_token": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "/api/v2/"
+        }
+    ],
+
+    "paths": {
+        "/login": {
+            "post": {
+                "description": "Make login on application",
+                "responses": {
+                    "201": {
+                        "description": "User login sucess",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Users"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

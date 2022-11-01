@@ -16,6 +16,7 @@ flask-migrate = "*"
 pymysql = "*"
 pytest-cov = "*"
 pytest = "*"
+flask-swagger-ui = "*"
 
 [dev-packages]
 
